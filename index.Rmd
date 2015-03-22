@@ -1,0 +1,77 @@
+---
+title       : Fahrenheit to Celsius Converter
+subtitle    : 
+author      : Mary Tipton
+job         : 
+framework   : revealjs       # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : [bootstrap, quiz]            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+runtime     : shiny
+---
+
+## Fahrenheit to Celsius Converter
+
+---
+
+## For what is it used?
+
+This is a simple Shiny App that can be used to convert temperatures in Fahrenheit to Celsius.
+
+
+---
+## The Relationship Between Fahrenheit and Celsius
+```{r, eval=TRUE, cache=FALSE, echo=FALSE}
+library(ggplot2)
+cel <- c(0,35,100)
+fah <- c(32,95,212)
+data <- data.frame(fah,cel)
+g <- ggplot(data, aes(x=fah, y=cel))
+g+geom_point(size=5, colour="red")+geom_line()+xlab("Fahrenheit")+ylab("Celsius")+ geom_segment(aes(xend=fah, yend=0), color="blue")+ geom_segment(aes(xend=0, yend=cel), color="blue")+geom_vline(xintercept=0)+geom_hline(yintercept=0)+annotate("text", x=32, y= 20, label="Water Freezing")+annotate("text", x=160, y=95, label="Water Boiling")
+```
+
+---
+
+## ui.R
+
+```{r, eval=FALSE}
+library(shiny)
+library(shinythemes)
+
+shinyUI(fluidPage(theme=shinytheme('flatly'),
+    pageWithSidebar(
+    headerPanel("Convert from Fahrenheit to Celsius"),
+
+  # Sidebar with input  
+    sidebarPanel(
+        helpText("Input temperature in Fahrenheit and click Submit."),
+      numericInput('fahrenheit', "Temperature in Fahrenheit", 0, min=0, step=1),
+      submitButton("Submit")),
+
+    # Show the Data Entered and the Calculation
+    mainPanel(
+        h4("You entered:"),
+        verbatimTextOutput('fahrenheit'),
+        h4("Which in Celsius is:"),
+        verbatimTextOutput('celsius')))))
+```
+
+---
+
+## server.R
+```{r, eval=FALSE}
+library(shiny)
+library(shinythemes)
+
+#function to convert fahrenheit to celsius
+fahToCel<-  function(fahrenheit) ((fahrenheit-32)*(5/9))
+
+shinyServer(function(input, output) {
+    output$fahrenheit <- renderPrint({input$fahrenheit})
+    output$celsius  <- renderPrint({fahToCel(input$fahrenheit)})})
+```
+
+
+
